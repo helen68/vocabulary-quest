@@ -1,6 +1,0 @@
-{
-  "name": "Vocabulary Quest",
-  "description": "單字冒險 60 天：一個專為國中生設計的卡通趣味英文單字背誦與測驗遊戲，包含 60 天挑戰、複習機制與學習紀錄。",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
