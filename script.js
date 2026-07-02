@@ -352,7 +352,7 @@ async function loadVocabulary() {
     showLoading(true);
     try {
         // 在本地 file:// 協議下 fetch 會受跨域 CORS 阻擋，如果失敗將會直接 catch 到 fallback
-        const response = await fetch("../vocabulary_full.csv");
+        const response = await fetch("./vocabulary_full.csv");
         if (!response.ok) {
             throw new Error("無法取得 CSV 檔案，準備進入備用方案");
         }
