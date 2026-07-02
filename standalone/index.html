@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字冒險 60 天：Vocabulary Quest</title>
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#F3F8FF] text-slate-800 min-h-screen flex flex-col font-sans select-none">
+
+    <!-- Playful Header -->
+    <header class="bg-white border-b-4 border-slate-950 py-4 px-6 sticky top-0 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showView('home')">
+            <div class="bg-amber-400 border-2 border-slate-950 p-2 rounded-xl">
+                <span class="text-2xl">🎒</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-display font-black text-slate-900 tracking-tight">
+                    單字冒險 60 天 <span class="text-amber-500">Vocabulary Quest</span>
+                </h1>
+                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase">
+                    國中生英文單字背誦試煉 · 關卡自訂版
+                </p>
+            </div>
+        </div>
+        <nav class="flex items-center gap-2">
+            <button onclick="showView('home')" class="nav-btn bg-amber-400 border-2 border-slate-950 px-4 py-2 rounded-xl font-bold text-sm shadow-[2px_2px_0px_rgba(15,23,42,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all">首頁</button>
+            <button onclick="showView('map')" class="nav-btn bg-white border-2 border-slate-950 px-4 py-2 rounded-xl font-bold text-sm shadow-[2px_2px_0px_rgba(15,23,42,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all">冒險地圖</button>
+            <button onclick="showView('records')" class="nav-btn bg-white border-2 border-slate-950 px-4 py-2 rounded-xl font-bold text-sm shadow-[2px_2px_0px_rgba(15,23,42,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] transition-all">學習歷程</button>
+        </nav>
+    </header>
+
+    <!-- Main Container for Views -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        
+        <!-- LOADING VIEW -->
+        <div id="view-loading" class="view text-center flex flex-col items-center gap-3">
+            <div class="animate-spin text-5xl">🔄</div>
+            <p class="text-slate-600 font-bold text-lg">正在同步單字冒險王國，請稍候...</p>
+        </div>
+
+        <!-- ERROR/WARN BANNER (Data check failed) -->
+        <div id="data-error-banner" class="hidden max-w-2xl bg-rose-50 border-4 border-rose-950 rounded-2xl p-6 text-center shadow-lg my-8">
+            <span class="text-5xl">⚠️</span>
+            <h3 class="text-2xl font-black text-rose-950 mt-4 mb-2">單字資料載入失敗</h3>
+            <p id="data-error-msg" class="text-slate-700 text-sm leading-relaxed mb-4"></p>
+            <button onclick="loadWithFallback()" class="bg-amber-400 border-2 border-slate-950 px-6 py-3 rounded-xl font-bold text-slate-900 font-display shadow-md">
+                啟動內建 310 字備用單字庫
+            </button>
+        </div>
+
+        <!-- 1. HOME VIEW -->
+        <div id="view-home" class="view hidden flex flex-col items-center justify-center max-w-4xl mx-auto text-center py-6">
+            <div class="relative inline-block mb-8">
+                <div class="bg-amber-400 text-slate-950 border-4 border-slate-950 p-6 rounded-3xl shadow-[6px_6px_0px_rgba(15,23,42,1)] max-w-md">
+                    <span class="text-5xl block mb-2 animate-bounce-slow">🚀🎒</span>
+                    <h1 class="text-4xl md:text-5xl font-display font-black text-slate-900 tracking-tight leading-none">
+                        單字冒險 60 天
+                    </h1>
+                    <div class="text-xl md:text-2xl font-display font-bold text-slate-800 mt-2 uppercase tracking-wider">
+                        Vocabulary Quest
+                    </div>
+                </div>
+                <div class="absolute -top-4 -right-4 text-4xl">⭐</div>
+                <div class="absolute -bottom-2 -left-6 text-4xl">✨</div>
+            </div>
+
+            <!-- Description Card -->
+            <div class="bg-white border-4 border-slate-950 p-6 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] max-w-2xl w-full mb-8 text-left">
+                <h2 class="text-xl font-black text-slate-800 mb-4 flex items-center gap-2">
+                    ✨ 冒險行前指南
+                </h2>
+                <p class="text-slate-600 leading-relaxed text-sm mb-4">
+                    歡迎來到單字冒險世界！這是一個專為國中生打造的英文單字背誦樂園。
+                    在 60 天的旅程中，你將每天背誦並挑戰 5 個全新的英文單字，並且複習前一天的 10 個單字。
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 font-bold">
+                    <div class="bg-amber-50 p-3 rounded-xl border-2 border-amber-200">
+                        📅 Day 1 取 10 個核心字，後續每天 5 個，總共 305 個不重複國中常用單字。
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl border-2 border-blue-200">
+                        🔄 溫故知新：每天自動回顧與測驗前一天的 10 個單字，加深記憶。
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl border-2 border-emerald-200">
+                        ⭐ 通過認證：測驗達 80 分以上可通關並解鎖翌日關卡，滿分榮獲 3 星！
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-xl border-2 border-purple-200">
+                        📊 完整學習履歷：內建 localStorage 永久儲存成績、星星與錯題。
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
+                <button onclick="showView('map')" class="flex-1 bg-amber-400 hover:bg-amber-300 border-4 border-slate-950 text-slate-900 text-lg font-bold font-display py-4 px-6 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_rgba(15,23,42,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[0px_0px_0px_rgba(15,23,42,1)] transition-all">
+                    🎮 開始單字冒險
+                </button>
+                <button onclick="showView('records')" class="flex-1 bg-sky-400 hover:bg-sky-300 border-4 border-slate-950 text-slate-900 text-lg font-bold font-display py-4 px-6 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_rgba(15,23,42,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[0px_0px_0px_rgba(15,23,42,1)] transition-all">
+                    🏆 學習成果紀錄
+                </button>
+            </div>
+
+            <div class="mt-8 text-xs text-slate-400 bg-white border border-slate-200 py-2 px-4 rounded-full">
+                資料載入來源：<span id="home-data-badge" class="font-bold text-slate-700">檢查中...</span>
+            </div>
+
+            <div id="standalone-stats-card" class="hidden bg-white border-4 border-slate-950 p-5 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] max-w-2xl w-full mt-6 text-left">
+                <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2 justify-center sm:justify-start">
+                    📊 單字庫數據與關卡分配報告 (Level Generation Data Validation)
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 text-center text-[11px]">
+                    <div class="bg-slate-50 p-1 rounded-lg border border-slate-200">
+                        <div class="text-slate-500">總單字數</div>
+                        <div id="stat-total" class="font-bold text-slate-800 text-sm">0</div>
+                    </div>
+                    <div class="bg-emerald-50 p-1 rounded-lg border border-emerald-200">
+                        <div class="text-slate-500">不重複單字數</div>
+                        <div id="stat-unique" class="font-bold text-emerald-700 text-sm">0</div>
+                    </div>
+                    <div class="bg-sky-50 p-1 rounded-lg border border-sky-200">
+                        <div class="text-slate-500">已建立關卡數</div>
+                        <div id="stat-levels" class="font-bold text-sky-700 text-sm">0</div>
+                    </div>
+                    <div class="bg-amber-50 p-1 rounded-lg border border-amber-200">
+                        <div class="text-slate-500">已使用新單字數</div>
+                        <div id="stat-used" class="font-bold text-amber-700 text-sm">0</div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-[10px]">
+                    <h4 class="font-bold text-slate-500 mb-1">關卡新單字詞性混合分配統計：</h4>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 text-center">
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-indigo-600 block">名詞 (n)</span>
+                            <span id="pos-noun" class="font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-rose-600 block">動詞 (v)</span>
+                            <span id="pos-verb" class="font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-emerald-600 block">形容詞 (adj)</span>
+                            <span id="pos-adj" class="font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-amber-600 block">副詞 (adv)</span>
+                            <span id="pos-adv" class="font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-cyan-600 block">片語 (phrase)</span>
+                            <span id="pos-phrase" class="font-bold text-slate-700">0</span>
+                        </div>
+                        <div class="bg-white p-1 rounded border border-slate-150 shadow-sm">
+                            <span class="font-bold text-purple-600 block">其他 (other)</span>
+                            <span id="pos-other" class="font-bold text-slate-700">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. LEVEL MAP VIEW -->
+        <div id="view-map" class="view hidden w-full max-w-6xl mx-auto py-4">
+            <!-- Map Header -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white border-4 border-slate-950 p-5 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] mb-6">
+                <div class="flex items-center gap-3">
+                    <button onclick="showView('home')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl border-2 border-slate-950">
+                        ⬅ 返回首頁
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-black font-display text-slate-900">冒險地圖</h2>
+                        <p class="text-xs text-slate-500">Day 1 ~ Day 60 單字關卡挑戰</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="bg-amber-100 text-amber-900 font-bold px-3 py-1.5 rounded-xl border border-amber-300 text-xs">
+                        ⭐ 累計星數：<span id="map-stars-count" class="font-black text-sm">0</span> 顆
+                    </div>
+                    <div class="bg-emerald-100 text-emerald-900 font-bold px-3 py-1.5 rounded-xl border border-emerald-300 text-xs">
+                        🏁 總進度：<span id="map-progress-percent" class="font-black text-sm">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="bg-white border-2 border-slate-950 p-3 rounded-xl mb-6">
+                <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                    <span>🎒 冒險總進度</span>
+                    <span id="map-bar-percent">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-4 rounded-full border border-slate-800 overflow-hidden p-0.5">
+                    <div id="map-progress-bar-fill" class="bg-emerald-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Level buttons grid (generated dynamically) -->
+            <div id="levels-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-3 mb-8"></div>
+        </div>
+
+        <!-- 3. STUDY PAGE VIEW -->
+        <div id="view-study" class="view hidden w-full max-w-3xl mx-auto py-4">
+            <div class="flex justify-between items-center bg-white border-4 border-slate-950 p-4 rounded-xl shadow-sm mb-6">
+                <button onclick="showView('map')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl border-2 border-slate-950 text-xs">
+                    ⬅ 返回地圖
+                </button>
+                <h2 id="study-level-title" class="text-lg font-black font-display text-slate-900">Day 1 任務</h2>
+                <div class="w-16"></div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div id="study-tabs-container" class="grid grid-cols-2 gap-2 p-1.5 bg-slate-200 rounded-xl border-2 border-slate-950 mb-6 font-bold text-sm">
+                <button id="tab-btn-review" onclick="toggleStudyTab('review')" class="py-2 rounded-lg text-center bg-sky-400 border border-slate-950">溫故回顧</button>
+                <button id="tab-btn-new" onclick="toggleStudyTab('new')" class="py-2 rounded-lg text-center bg-white">今日新字</button>
+            </div>
+
+            <div id="study-tip-banner" class="p-3 bg-amber-50 text-amber-900 font-bold border-2 border-slate-950 rounded-xl text-center text-xs mb-6">
+                💡 正在學習新字，點擊卡片可切換中英文解釋！
+            </div>
+
+            <!-- Word Card Display -->
+            <div class="flex flex-col items-center">
+                <div id="study-card-counter" class="text-xs text-slate-500 font-bold mb-2">1 / 10 字</div>
+                
+                <!-- Bubbly Flip Word Card -->
+                <div onclick="flipCard()" class="w-full max-w-md h-72 perspective-1000 cursor-pointer mb-6">
+                    <div id="study-card-flipper" class="w-full h-full duration-300 preserve-3d relative">
+                        
+                        <!-- Front (English) -->
+                        <div class="absolute inset-0 bg-white border-4 border-slate-950 rounded-3xl p-6 flex flex-col justify-between items-center backface-hidden shadow-[4px_4px_0px_rgba(15,23,42,1)]">
+                            <div class="w-full flex justify-between text-[10px] text-slate-400 font-bold">
+                                <span>詞卡模式</span>
+                                <span class="text-amber-500">點擊卡片翻面 👆</span>
+                                <span id="study-card-page-front">p.1</span>
+                            </div>
+                            <div class="text-center my-auto">
+                                <h3 id="study-card-word" class="text-4xl md:text-5xl font-display font-black text-slate-900 mb-2">apple</h3>
+                                <span id="study-card-pos" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-200">n.</span>
+                            </div>
+                            <button onclick="event.stopPropagation(); speakCurrentWord();" class="bg-amber-100 hover:bg-amber-200 border-2 border-slate-950 py-2 px-4 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm">
+                                🔊 語音發音
+                            </button>
+                        </div>
+
+                        <!-- Back (Chinese) -->
+                        <div class="absolute inset-0 bg-amber-100 border-4 border-slate-950 rounded-3xl p-6 flex flex-col justify-between items-center backface-hidden rotate-y-180 shadow-[4px_4px_0px_rgba(15,23,42,1)]">
+                            <div class="w-full flex justify-between text-[10px] text-slate-500 font-bold">
+                                <span>中文釋義</span>
+                                <span class="text-slate-500">已翻面 🔄</span>
+                                <span id="study-card-page-back">p.1</span>
+                            </div>
+                            <div class="text-center my-auto">
+                                <span id="study-card-pos-back" class="bg-amber-200 text-amber-950 text-xs font-bold px-2 rounded-full border border-amber-300">n.</span>
+                                <h3 id="study-card-meaning" class="text-3xl font-bold text-slate-900 mt-2">蘋果</h3>
+                            </div>
+                            <div id="study-card-word-back" class="text-xs text-slate-600 bg-white px-3 py-1 rounded-full border border-slate-200 font-bold">apple</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Navigation buttons -->
+                <div class="flex gap-4 w-full max-w-xs mb-8">
+                    <button id="study-btn-prev" onclick="prevCard()" class="flex-1 bg-white border-2 border-slate-950 font-bold py-3.5 px-4 rounded-xl shadow-sm">上一張</button>
+                    <button id="study-btn-next" onclick="nextCard()" class="flex-1 bg-white border-2 border-slate-950 font-bold py-3.5 px-4 rounded-xl shadow-sm">下一張</button>
+                </div>
+
+                <div class="w-full max-w-md border-t-2 border-slate-300 border-dashed pt-6 text-center">
+                    <button onclick="startLevelQuiz()" class="bg-emerald-400 hover:bg-emerald-300 border-4 border-slate-950 text-slate-900 text-lg font-black py-4 px-8 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] w-full">
+                        ⚡ 發起今日測驗挑戰
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. QUIZ VIEW -->
+        <div id="view-quiz" class="view hidden w-full max-w-3xl mx-auto py-4">
+            <div class="bg-white border-4 border-slate-950 p-4 rounded-xl shadow-sm mb-6 flex justify-between items-center">
+                <span id="quiz-level-label" class="text-sm font-black text-slate-900">Day 1 試煉</span>
+                <span id="quiz-question-counter" class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-bold">第 1 / 10 題</span>
+                <div class="text-xs font-bold">答對數: <span id="quiz-correct-count" class="text-emerald-500 text-sm">0</span></div>
+            </div>
+
+            <!-- Quiz card -->
+            <div class="bg-white border-4 border-slate-950 p-6 rounded-3xl shadow-[4px_4px_0px_rgba(15,23,42,1)] text-center mb-6 relative overflow-hidden">
+                <span id="quiz-card-pos" class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full border border-amber-200">n.</span>
+                <h2 id="quiz-card-word" class="text-4xl font-display font-black text-slate-900 my-4">apple</h2>
+                <button onclick="speakQuizWord()" class="bg-slate-100 border border-slate-300 px-3 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1 cursor-pointer">
+                    🔊 發音
+                </button>
+            </div>
+
+            <!-- Four choices -->
+            <div id="quiz-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+
+            <!-- Answer Result overlay -->
+            <div id="quiz-answer-alert" class="hidden p-4 rounded-2xl border-4 shadow-sm mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex gap-2 items-center text-center sm:text-left">
+                  <span id="quiz-alert-emoji" class="text-3xl">🎉</span>
+                  <div>
+                    <h4 id="quiz-alert-title" class="font-bold">回答正確！</h4>
+                    <p id="quiz-alert-body" class="text-xs opacity-90"></p>
+                  </div>
+                </div>
+                <button id="quiz-btn-next-question" onclick="nextQuizQuestion()" class="bg-slate-900 text-white font-bold px-6 py-2 rounded-xl text-sm">下一題</button>
+            </div>
+        </div>
+
+        <!-- 5. RESULT VIEW -->
+        <div id="view-result" class="view hidden w-full max-w-2xl mx-auto text-center py-4">
+            <div class="bg-white border-4 border-slate-950 p-8 rounded-3xl shadow-[4px_4px_0px_rgba(15,23,42,1)] mb-6">
+                <div id="result-status-badge" class="bg-emerald-100 border-2 border-slate-950 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 text-3xl">🏆</div>
+                <h2 id="result-title" class="text-2xl font-display font-black text-slate-900">恭喜通關！</h2>
+                <p id="result-level-subtitle" class="text-xs text-slate-400 mt-1">Day 1 測驗結果</p>
+
+                <!-- Stars container -->
+                <div id="result-stars-container" class="flex justify-center gap-2 my-4"></div>
+
+                <!-- Score board -->
+                <div class="inline-block bg-slate-900 text-white border-4 border-slate-950 rounded-xl py-3 px-6 mb-4">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">測驗分數</div>
+                    <div id="result-score-num" class="text-4xl font-black font-mono">100<span class="text-sm">分</span></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 max-w-xs mx-auto mb-4 text-xs font-bold">
+                    <div class="bg-emerald-50 text-emerald-800 p-2.5 rounded-lg border">答對：<span id="result-stat-correct">0</span> 題</div>
+                    <div class="bg-rose-50 text-rose-800 p-2.5 rounded-lg border">答錯：<span id="result-stat-wrong">0</span> 題</div>
+                </div>
+
+                <p id="result-encouragement" class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600 leading-relaxed font-bold mb-4"></p>
+
+                <!-- Wrong words lists -->
+                <div id="result-wrong-words-box" class="hidden text-left bg-rose-50 border border-rose-200 rounded-xl p-4">
+                    <h4 class="font-bold text-rose-800 text-xs mb-2">💡 答錯單字重點複習：</h4>
+                    <div id="result-wrong-words-list" class="flex flex-col gap-1.5"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto justify-center font-bold text-sm">
+                <button onclick="restartStudy()" class="flex-1 bg-amber-400 border-2 border-slate-950 p-3 rounded-xl">重新練習</button>
+                <button onclick="startLevelQuiz()" class="flex-1 bg-sky-400 border-2 border-slate-950 p-3 rounded-xl">重新測驗</button>
+                <button onclick="showView('map')" class="flex-1 bg-slate-800 text-white border-2 border-slate-950 p-3 rounded-xl">回冒險地圖</button>
+            </div>
+        </div>
+
+        <!-- 6. RECORDS VIEW -->
+        <div id="view-records" class="view hidden w-full max-w-5xl mx-auto py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white border-4 border-slate-950 p-5 rounded-2xl shadow-[4px_4px_0px_rgba(15,23,42,1)] mb-6">
+                <div class="flex items-center gap-3">
+                    <button onclick="showView('home')" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 py-2 rounded-xl border-2 border-slate-950">
+                        ⬅ 返回首頁
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-black font-display text-slate-900">學習成果檔案</h2>
+                        <p class="text-xs text-slate-500">測驗紀錄與學術統計分析</p>
+                    </div>
+                </div>
+                <button onclick="resetLearnerProgress()" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border-2 border-rose-300 font-bold px-4 py-2 rounded-xl text-xs">
+                    🧹 清除學習進度
+                </button>
+            </div>
+
+            <!-- Stats grids -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 font-bold text-center">
+                <div class="bg-white border-2 border-slate-950 p-4 rounded-xl">
+                    <span class="text-2xl">🏁</span>
+                    <div id="record-stat-passed" class="text-xl font-black">0 關</div>
+                    <div class="text-[10px] text-slate-400 uppercase mt-0.5">通關關卡</div>
+                </div>
+                <div class="bg-white border-2 border-slate-950 p-4 rounded-xl">
+                    <span class="text-2xl">⭐</span>
+                    <div id="record-stat-stars" class="text-xl font-black">0 顆</div>
+                    <div class="text-[10px] text-slate-400 uppercase mt-0.5">累計星星</div>
+                </div>
+                <div class="bg-white border-2 border-slate-950 p-4 rounded-xl">
+                    <span class="text-2xl">📈</span>
+                    <div id="record-stat-progress" class="text-xl font-black">0%</div>
+                    <div class="text-[10px] text-slate-400 uppercase mt-0.5">課程總進度</div>
+                </div>
+                <div class="bg-white border-2 border-slate-950 p-4 rounded-xl">
+                    <span class="text-2xl">🔥</span>
+                    <div id="record-stat-attempts" class="text-xl font-black">0 次</div>
+                    <div class="text-[10px] text-slate-400 uppercase mt-0.5">累計測驗次數</div>
+                </div>
+            </div>
+
+            <!-- Records table -->
+            <div class="bg-white border-4 border-slate-950 rounded-2xl p-6 overflow-hidden shadow-[4px_4px_0px_rgba(15,23,42,1)]">
+                <h3 class="font-black text-slate-800 mb-4 flex items-center gap-1.5 text-base">
+                    📝 關卡冒險歷史檔案
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse font-bold">
+                        <thead>
+                            <tr class="border-b-2 border-slate-200 text-slate-400">
+                                <th class="py-2.5 px-3">關卡</th>
+                                <th class="py-2.5 px-3 text-center">狀態</th>
+                                <th class="py-2.5 px-3 text-center">最佳分數</th>
+                                <th class="py-2.5 px-3 text-center">前次分數</th>
+                                <th class="py-2.5 px-3 text-center">測驗次數</th>
+                                <th class="py-2.5 px-3 text-center">星星數</th>
+                                <th class="py-2.5 px-3">錯題生字複習</th>
+                                <th class="py-2.5 px-3 text-right">最後挑戰時間</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Playful Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 px-4 border-t-4 border-slate-950 text-center text-xs">
+        <p class="font-bold text-slate-300">🎮 單字冒險 60 天 (Vocabulary Quest) — Standalone HTML5 遊戲版本</p>
+        <p class="opacity-75 mt-1">
+            專為國中生背誦段考與會考英文單字設計 · 本地 CSV 自動載入並配置關卡
+        </p>
+    </footer>
+
+    <!-- Standalone Script -->
+    <script src="script.js"></script>
+</body>
+</html>
